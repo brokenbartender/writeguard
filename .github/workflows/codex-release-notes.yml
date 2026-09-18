@@ -25,7 +25,7 @@ jobs:
       TAG: ${{ github.event.release.tag_name || inputs.tag }}
       REPO: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Guard — require API key
