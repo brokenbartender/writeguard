@@ -1,0 +1,51 @@
+name: Codex Issue Triage
+
+# AI-assisted triage on new issues: proposes a category + labels + a next-step, as a comment.
+# A human maintainer applies labels and decides. Skips cleanly without OPENAI_API_KEY.
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CODEX_MODEL: ${{ vars.CODEX_MODEL || 'gpt-4.1-mini' }}
+      ISSUE: ${{ github.event.issue.number }}
+      REPO: ${{ github.repository }}
+      TITLE: ${{ github.event.issue.title }}
+      BODY: ${{ github.event.issue.body }}
+    steps:
+      - name: Guard — require API key
+        id: guard
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Triage with the model
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          SYSTEM='You triage issues for writeguard, a Python library that verifies AI-agent filesystem claims. Given an issue, respond with: (1) a one-line category — one of [bug, feature, question, docs, security, invalid]; (2) up to 3 suggested labels; (3) one concrete next step for the maintainer or reporter. If it appears to be a security vulnerability, tell the reporter to use the private advisory in SECURITY.md instead. Keep it to a few lines.'
+          REQ=$(jq -n --arg m "$CODEX_MODEL" --arg s "$SYSTEM" --arg t "$TITLE" --arg b "$BODY" '{
+            model: $m,
+            messages: [
+              {role:"system", content:$s},
+              {role:"user", content:("Issue title: " + $t + "\n\nBody:\n" + ($b // "(no body)"))}
+            ],
+            temperature: 0.1
+          }')
+          RESP=$(curl -sS https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer $OPENAI_API_KEY" -H "Content-Type: application/json" -d "$REQ")
+          BODY_OUT=$(echo "$RESP" | jq -r '.choices[0].message.content // empty')
+          [ -z "$BODY_OUT" ] && { echo "::warning::no triage content"; exit 0; }
+          {
+            echo "🤖 **Suggested triage** (advisory — a maintainer confirms)"
+            echo
+            echo "$BODY_OUT"
+          } > triage.md
+          gh issue comment "$ISSUE" --repo "$REPO" --body-file triage.md

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/brokenbartender/writeguard/security/advisories/new
+    about: This is a security library — please report vulnerabilities privately, not as a public issue. See SECURITY.md.
+  - name: 💬 Questions & usage help
+    url: https://github.com/brokenbartender/writeguard/discussions
+    about: Ask questions and share use cases in Discussions.

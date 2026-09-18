@@ -1,0 +1,16 @@
+name: Bug report
+description: Something isn't verifying correctly
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes: {label: What happened, description: What did you expect vs. what verified?}
+    validations: {required: true}
+  - type: textarea
+    id: repro
+    attributes: {label: Minimal reproduction, render: python}
+    validations: {required: true}
+  - type: input
+    id: version
+    attributes: {label: "writeguard + Python version"}
+    validations: {required: true}

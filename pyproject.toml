@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=67", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "writeguard"
+version = "0.1.0"
+description = "Verify your AI coding agent actually did what it claims to the filesystem — hash-based, framework-agnostic"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "Cody McKenzie"}]
+keywords = ["ai", "llm", "coding-agent", "hallucination", "filesystem", "verification", "agents", "codex", "guardrails"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/brokenbartender/writeguard"
+Issues = "https://github.com/brokenbartender/writeguard/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["writeguard*"]
+
+[tool.setuptools.package-data]
+writeguard = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
